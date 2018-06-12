@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Upload new Files</title>
+</head>
+<body>
+<center>
+
+<h1>Upload new File</h1>
+<form action="/file" method=post enctype=multipart/form-data>
+  <p><input id="fileupload" type=file name=file>
+     <input type=submit value=Upload></p>
+</form>
+
+<h1>Upload new File</h1>
+<form action="/text" method=post enctype=multipart/form-data>
+<textarea name="textupload" rows="4" cols="50">
+</textarea><br>
+<input type=submit value=Submit>
+</form>
+
+<br><hr>
+{{correct}}
+<hr>
+
+</center>
+
+</body>
+</html>
