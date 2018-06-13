@@ -4,10 +4,7 @@ from werkzeug.utils import secure_filename
 import glob
 from uuid import uuid4
 import subprocess
-from text_process import extract_d,scam_check
-
-#import language_check
-#tool = language_check.LanguageTool('en-US')
+from src import extractdoc, checker
 
 UPLOAD_FOLDER = './test'
 ALLOWED_EXTENSIONS = set(['docx'])
@@ -34,8 +31,6 @@ def upload_file():
             print('no file')
             return redirect(request.url)
         file = request.files['file']
-        #print(file)
-        
 
         if file.filename == '':
             print('no filename')
@@ -53,10 +48,7 @@ def upload_text():
     print("text")
     if request.method == 'POST' and 'textupload' in request.form:
         text = request.form['textupload']
-        
-        corrected=scam_check.modify(text)
-        #matches = tool.check(text)
-        #corrected = language_check.correct(text, matches)
+        corrected = checker.modify(text)
 
         return render_template('index.html', correct=corrected)
 
