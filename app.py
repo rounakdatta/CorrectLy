@@ -45,12 +45,11 @@ def upload_file():
 
 @app.route('/text', methods=['GET', 'POST'])
 def upload_text():
-    print("text")
     if request.method == 'POST' and 'textupload' in request.form:
         text = request.form['textupload']
         corrected = checker.modify(text)
 
-        return render_template('index.html', correct=corrected)
+        return render_template('index.html', correct=corrected, wrong=text)
 
     return render_template('index.html')
 
