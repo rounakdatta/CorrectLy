@@ -9,7 +9,7 @@ tool = lc.LanguageTool('en-US')
 en_nlp = spacy.load('en')
 combos = []
 
-def VB_VB_VB_correction(payload, raw_text):
+def VB_VB_VB_correction(payload, raw_text): # correct errors of type has-been-walking
 	if(payload.tag_[:2] != 'VB' and payload.tag_[:2] != 'NN'  and payload.tag_[:2] != 'JJ'):
 		return
 	for ch in payload.children:
@@ -49,7 +49,23 @@ def VB_VB_VB_correction(payload, raw_text):
 			return raw_text
 	return raw_text
 
-def VB_IN_NN(payload):
+def VB_VB_correction(payload, raw_text): # correct errors of type is-walking OR has-cooked
+    if(payload.tag_[:2] != 'VB'):
+        return
+    for ch in payload.children:
+        if(ch.tag_[:2] == 'VB'): # this might need to be removed
+            VB_VB_VB_correction(ch, raw_text)
+            
+            if(ch.lower_ == 'has') or (ch.lower_ == 'have') or (ch.lower_ == 'had'):
+                x = conjugate(verb=lemma(payload.text), tense=PAST+PARTICIPLE, mood=INDICATIVE, person=1, number=PL)
+            else:
+                x = conjugate(verb=lemma(payload.text), tense=PRESENT, mood=INDICATIVE, aspect=PROGRESSIVE, person=1, number=PL)
+        
+            raw_text = raw_text[:payload.idx] + raw_text[payload.idx:].replace(payload.text, x, 1)
+            return raw_text
+    return raw_text
+
+def VB_IN_NN(payload): # generate verb-preposition-noun combos (IN is a misnomer here)
 	if(payload.tag_[:2] != 'VB'):
 		return
 	for ch in payload.children:
@@ -66,7 +82,7 @@ def VB_IN_NN(payload):
 					grammar[payload.text.lower()][sec.text.lower()] = ch.text.lower()
 				return
 
-def VB_IN_NN_correction(payload, raw_text, master_dictionary):
+def VB_IN_NN_correction(payload, raw_text, master_dictionary): # correct the verb-preposition-noun combos from the master dict
 	if(payload.tag_[:2] != 'VB'):
 		return
 	for ch in payload.children:
@@ -86,7 +102,7 @@ def VB_IN_NN_correction(payload, raw_text, master_dictionary):
 							return raw_text
 					except KeyError:
 						return raw_text
-				return
+	return raw_text
 
 def modify(text):
 
@@ -99,6 +115,7 @@ def modify(text):
 
 	doc = en_nlp(text)
 	for sent in doc.sents:
+		text = VB_VB_correction(sent.root, text)
 		text = VB_VB_VB_correction(sent.root, text)
 		text = VB_IN_NN_correction(sent.root, text, correctly)
 
