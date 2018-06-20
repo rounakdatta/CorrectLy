@@ -4,7 +4,9 @@ from werkzeug.utils import secure_filename
 import glob
 from uuid import uuid4
 import subprocess
-from src import extractdoc, checker
+
+from src import checker
+from src.extractdoc import scrape_docx
 
 UPLOAD_FOLDER = './test'
 ALLOWED_EXTENSIONS = set(['docx'])
@@ -24,7 +26,6 @@ def serve():
 
 @app.route('/file', methods=['GET', 'POST'])
 def upload_file():
-    print("file")
     if request.method == 'POST':
         
         if 'file' not in request.files:
@@ -39,7 +40,10 @@ def upload_file():
             filename = secure_filename(file.filename)
             file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
 
-            return render_template('index.html')
+            text = scrape_docx('./test/' + filename)
+            corrected = checker.modify(text)
+
+            return render_template('index.html', correct=corrected, wrong=text)
 
     return render_template('index.html')
 
@@ -56,7 +60,6 @@ def upload_text():
 
 @app.route('/uploads/<filename>')
 def uploaded_file(filename):
-    print("uf")
     return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
 
 if __name__ == "__main__":

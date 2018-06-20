@@ -11,7 +11,7 @@ combos = []
 
 def VB_VB_VB_correction(payload, raw_text): # correct errors of type has-been-walking
 	if(payload.tag_[:2] != 'VB' and payload.tag_[:2] != 'NN'  and payload.tag_[:2] != 'JJ'):
-		return
+		return raw_text
 	for ch in payload.children:
 		if(ch.tag_[:2] == 'VB'): # this might need to be removed
 			VB_VB_VB_correction(ch, raw_text)
@@ -34,40 +34,45 @@ def VB_VB_VB_correction(payload, raw_text): # correct errors of type has-been-wa
 			temp.append(ch.lower_ + '_' + ch.tag_)
 		if(len(temp) == 2):
 			temp.append(payload.lower_+ '_' + ch.tag_)
-			if (temp[0][-3:] == 'VBZ' or temp[0][-3:] == 'VBP') and temp[1][-3:] == 'VBN':
-				if nounAfterVerb or since:
+			try:
+				if (temp[0][-3:] == 'VBZ' or temp[0][-3:] == 'VBP') and temp[1][-3:] == 'VBN':
+					if nounAfterVerb or since:
+						x = conjugate(verb=lemma(temp[2][:-4]), tense=PRESENT, mood=INDICATIVE, aspect=PROGRESSIVE, person=1, number=PL)
+					elif nounBeforeVerb:
+						x = conjugate(verb=lemma(temp[2][:-4]), tense=PAST+PARTICIPLE, mood=INDICATIVE, person=1, number=PL)
+					# print(temp[2][:-4] + ' -> ' + x)
+				else:
 					x = conjugate(verb=lemma(temp[2][:-4]), tense=PRESENT, mood=INDICATIVE, aspect=PROGRESSIVE, person=1, number=PL)
-				elif nounBeforeVerb:
-					x = conjugate(verb=lemma(temp[2][:-4]), tense=PAST+PARTICIPLE, mood=INDICATIVE, person=1, number=PL)
-				# print(temp[2][:-4] + ' -> ' + x)
-			else:
-				x = conjugate(verb=lemma(temp[2][:-4]), tense=PRESENT, mood=INDICATIVE, aspect=PROGRESSIVE, person=1, number=PL)
-			combos.append(temp)
+				combos.append(temp)
 
-			raw_text = raw_text[:payload.idx] + raw_text[payload.idx:].replace(temp[2][:-4], x, 1)
-			temp = []
-			return raw_text
+				raw_text = raw_text[:payload.idx] + raw_text[payload.idx:].replace(temp[2][:-4], x, 1)
+				temp = []
+				return raw_text
+			except TypeError:
+				return raw_text
 	return raw_text
 
 def VB_VB_correction(payload, raw_text): # correct errors of type is-walking OR has-cooked
-    if(payload.tag_[:2] != 'VB'):
-        return
-    for ch in payload.children:
-        if(ch.tag_[:2] == 'VB'): # this might need to be removed
-            VB_VB_VB_correction(ch, raw_text)
-            
-            if(ch.lower_ == 'has') or (ch.lower_ == 'have') or (ch.lower_ == 'had'):
-                x = conjugate(verb=lemma(payload.text), tense=PAST+PARTICIPLE, mood=INDICATIVE, person=1, number=PL)
-            else:
-                x = conjugate(verb=lemma(payload.text), tense=PRESENT, mood=INDICATIVE, aspect=PROGRESSIVE, person=1, number=PL)
-        
-            raw_text = raw_text[:payload.idx] + raw_text[payload.idx:].replace(payload.text, x, 1)
-            return raw_text
-    return raw_text
+	if(payload.tag_[:2] != 'VB'):
+		return raw_text
+	for ch in payload.children:
+		if(ch.tag_[:2] == 'VB'): # this might need to be removed
+			VB_VB_VB_correction(ch, raw_text)	
+			try:
+				if(ch.lower_ == 'has') or (ch.lower_ == 'have') or (ch.lower_ == 'had'):
+					x = conjugate(verb=lemma(payload.text), tense=PAST+PARTICIPLE, mood=INDICATIVE, person=1, number=PL)
+				else:
+					x = conjugate(verb=lemma(payload.text), tense=PRESENT, mood=INDICATIVE, aspect=PROGRESSIVE, person=1, number=PL)
+			
+				raw_text = raw_text[:payload.idx] + raw_text[payload.idx:].replace(payload.text, x, 1)
+				return raw_text
+			except TypeError:
+				return raw_text
+	return raw_text
 
 def VB_IN_NN(payload): # generate verb-preposition-noun combos (IN is a misnomer here)
 	if(payload.tag_[:2] != 'VB'):
-		return
+		return raw_text
 	for ch in payload.children:
 		if(ch.tag_[:2] == 'VB'):
 			VB_IN_NN(ch)
@@ -84,7 +89,7 @@ def VB_IN_NN(payload): # generate verb-preposition-noun combos (IN is a misnomer
 
 def VB_IN_NN_correction(payload, raw_text, master_dictionary): # correct the verb-preposition-noun combos from the master dict
 	if(payload.tag_[:2] != 'VB'):
-		return
+		return raw_text
 	for ch in payload.children:
 		if(ch.tag_[:2] == 'VB'):
 			VB_IN_NN_correction(ch, raw_text, master_dictionary)
