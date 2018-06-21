@@ -24,6 +24,10 @@
 <br><hr>
 {{wrong}} ➡️ <b>{{correct}}</b>
 <hr>
+{% for error in errors %}
+	{{ error[0] }} : <b>{{ error[1] }}</b><br>
+{% endfor %}
+<hr>
 
 </center>
 

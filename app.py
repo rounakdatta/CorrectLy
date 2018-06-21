@@ -41,9 +41,9 @@ def upload_file():
             file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
 
             text = scrape_docx('./test/' + filename)
-            corrected = checker.modify(text)
+            corrected, errors = checker.modify(text)
 
-            return render_template('index.html', correct=corrected, wrong=text)
+            return render_template('index.html', correct=corrected, wrong=text, errors=errors)
 
     return render_template('index.html')
 
@@ -51,9 +51,9 @@ def upload_file():
 def upload_text():
     if request.method == 'POST' and 'textupload' in request.form:
         text = request.form['textupload']
-        corrected = checker.modify(text)
+        corrected, errors = checker.modify(text)
 
-        return render_template('index.html', correct=corrected, wrong=text)
+        return render_template('index.html', correct=corrected, wrong=text, errors=errors)
 
     return render_template('index.html')
 
