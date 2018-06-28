@@ -2,6 +2,23 @@
 <html>
 <head>
 	<title>CorrectLy</title>
+	<style>
+	table {
+	    font-family: arial, sans-serif;
+	    border-collapse: collapse;
+	    width: 100%;
+	}
+	
+	td, th {
+	    border: 1px solid #dddddd;
+	    text-align: center;
+	    padding: 8px;
+	}
+	
+	tr:nth-child(even) {
+	    background-color: #dddddd;
+	}
+	</style>
 </head>
 <body>
 <center>
@@ -24,10 +41,21 @@
 <br><hr>
 {{wrong}} ➡️ <b>{{correct}}</b>
 <hr>
-{% for error in errors %}
-	{{ error[0] }} : <b>{{ error[1] }}</b><br>
-{% endfor %}
-<hr>
+{% if errors is defined %}
+	{% for error in errors[:-2] %}
+		{{ error[0] }} : <b>{{ error[1] }}</b><br>
+	{% endfor %}
+	<hr>
+	<table>
+	<tr>
+	<th>Input Sentence Structure</th>
+	<th>Output Sentence Structure</th>
+	</tr>
+	{% for item in errors[-1] %}
+		<tr><td>{{ errors[-1][loop.index0] }}</td> <td>{{ errors[-2][loop.index0] }}</td></tr>
+	{% endfor %}
+	</table>
+{% endif %}
 
 </center>
 
