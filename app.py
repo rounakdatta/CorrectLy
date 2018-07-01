@@ -4,7 +4,8 @@ from werkzeug.utils import secure_filename
 import glob
 from uuid import uuid4
 import subprocess
-
+from textblob import TextBlob
+import docx
 from src import checker
 from src.extractdoc import scrape_docx
 
@@ -40,8 +41,32 @@ def upload_file():
             filename = secure_filename(file.filename)
             file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
 
-            text = scrape_docx('./test/' + filename)
+            text,para_c,sent_c,sent_p_c,total = scrape_docx('./test/' + filename)
+            #print(para_c)
+            #print(sent_c)
+            #print(sent_p_c)
             corrected, errors = checker.modify(text)
+            sent=[]
+            t=TextBlob(corrected)
+            for sen in t.sentences:
+                sent.append(str(sen))
+
+            doc1=docx.Document()
+            print(sent)
+            ts=0
+
+            for p in range(para_c):
+                #print(sent_p_c[p])
+                para=""
+                for s in range(sent_p_c[p]):
+                    if(ts<total):
+                        print(ts)
+                        para=para+sent[ts]+" "
+                        ts=ts+1
+                a=doc1.add_paragraph(para)
+            doc1.save('scam.docx')
+                
+                
 
             return render_template('index.html', correct=corrected, wrong=text, errors=errors)
 
