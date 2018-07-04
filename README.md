@@ -24,7 +24,7 @@ Grammar correction algorithms are implemented with help from these libraries. Th
 
 ## Getting started
 
-The project has been built entirely using Python 3. The backend framework is powered by Flask. To install all the dependencies, you need to clone the repository, navigate to it and  type ``make install``. To start the application, you can type ``make start`` OR ``python3 app.py`` and then navigate to [localhost:5000](http://localhost:5000).
+The project has been built entirely using Python 3. The backend framework is powered by Flask. To install all the dependencies, you need to clone the repository, navigate to it and type ``make install``. To start the application, you can type ``make start`` OR ``python3 app.py`` and then navigate to [localhost:5000](http://localhost:5000).
 
 The application can be used as:
 
