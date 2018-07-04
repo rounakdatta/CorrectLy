@@ -17,7 +17,7 @@ The project makes extensive use of the following Python NLP libraries:
 Grammar correction algorithms are implemented with help from these libraries. There are algorithms for:
 
  - Spelling correction (what are yuo doign in hte collrge -> **What are you doing in the college.**)
-  V-V correction (He is play in the garden. -> **He is playing in the garden.**)
+ - V-V correction (He is play in the garden. -> **He is playing in the garden.**)
  - V-V-V correction (Harry has been watched movie since afternoon. -> **Harry has been watching movie since afternoon.**)
  - Preposition correction (The children are sitting on the room. -> **The children are sitting in the room.**)
  - Sentence structure correction (I am looking at boy. -> **I am looking at the boy.**)
