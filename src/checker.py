@@ -45,6 +45,8 @@ def decode_coding(code):
 	return decoded_list
 
 def VB_VB_VB_correction(payload, raw_text, error_count): # correct errors of type has-been-walking
+	if 'been' not in raw_text.split():
+		return raw_text, error_count
 	if(payload.tag_[:2] != 'VB' and payload.tag_[:2] != 'NN'  and payload.tag_[:2] != 'JJ'):
 		return raw_text, error_count
 	for ch in payload.children:
@@ -92,14 +94,37 @@ def VB_VB_VB_correction(payload, raw_text, error_count): # correct errors of typ
 def VB_VB_correction(payload, raw_text, error_count): # correct errors of type is-walking OR has-cooked
 	if(payload.tag_[:2] != 'VB'):
 		return raw_text, error_count
+	nounBeforeVerb = False
+	nounAfterVerb = False
+	verbFound = False
+	if(payload.text == 'is' or payload.text == 'was' or payload.text == 'are' or payload.text == 'were'):
+		return raw_text, error_count
+
 	for ch in payload.children:
+		if(ch.tag_[:2] == 'VB'):
+			verbFound = True
+		if((not verbFound) and (ch.dep_ == 'nsubj')):
+			print(ch.lower_)
+			nounBeforeVerb = True
+		if(verbFound and (ch.dep_ == 'nsubj')):
+			nounAfterVerb = True
+
+		ifHave = False
+		ifBeen = False
 		if(ch.tag_[:2] == 'VB'): # this might need to be removed
 			dummy, error_count = VB_VB_VB_correction(ch, raw_text, error_count)	
 			try:
 				if(ch.lower_ == 'has') or (ch.lower_ == 'have') or (ch.lower_ == 'had'):
+					ifHave = True
+				if(ch.lower_ == 'been' or payload.text == "been"):
+					ifBeen = True
+
+				if(ifHave and ifBeen):
 					x = conjugate(verb=lemma(payload.text), tense=PAST+PARTICIPLE, mood=INDICATIVE, person=1, number=PL)
-				else:
+				elif(nounBeforeVerb and ((ch.lower_ == 'is') or (ch.lower_ == 'are') or (ch.lower_ == 'was') or (ch.lower_ == 'was') or (ch.lower_ == 'were'))):
 					x = conjugate(verb=lemma(payload.text), tense=PRESENT, mood=INDICATIVE, aspect=PROGRESSIVE, person=1, number=PL)
+				else:
+					x = payload.text
 				
 				if(x != payload.text):
 					error_count += 1
