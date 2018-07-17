@@ -1,7 +1,7 @@
 import language_check as lc
 import spacy
 from nltk import Tree
-from pattern.en import conjugate, lemma, lexeme, INFINITIVE, PRESENT, PAST, PARTICIPLE, FUTURE, SG, PL, INDICATIVE, IMPERATIVE, CONDITIONAL, SUBJUNCTIVE, PROGRESSIVE
+from pattern.en import conjugate, lemma, lexeme, INFINITIVE, PRESENT, PAST, PARTICIPLE, FUTURE, SG, PL, INDICATIVE, IMPERATIVE, CONDITIONAL, SUBJUNCTIVE, PROGRESSIVE, singularize
 import numpy as np
 import os
 from sympound import sympound
@@ -223,10 +223,17 @@ def modify(text):
 
 	matches = tool.check(text)
 	text = lc.correct(text,matches)
-	if(text[-1] != '.'):
-		text += '.'
 
 	doc = en_nlp(text)
+
+	# adding punctuation
+	punctFound = False
+	for token in doc:
+		if(token.dep_ == 'punct'):
+			punctFound = True
+	if not punctFound:
+		text += '.'
+
 	for sent in doc.sents:
 		text, e1 = VB_VB_correction(sent.root, text, 0)
 		text, e2 = VB_VB_VB_correction(sent.root, text, 0)
