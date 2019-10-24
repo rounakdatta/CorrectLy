@@ -4,6 +4,8 @@ from nltk import Tree
 from pattern.en import conjugate, lemma, lexeme, INFINITIVE, PRESENT, PAST, PARTICIPLE, FUTURE, SG, PL, INDICATIVE, IMPERATIVE, CONDITIONAL, SUBJUNCTIVE, PROGRESSIVE, singularize
 import numpy as np
 import os
+import time
+import tensorflow as tf
 from sympound import sympound
 import platform
 
