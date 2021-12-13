@@ -1,7 +1,7 @@
 Werkzeug==0.14.1
 spacy==2.0.9
 python_docx==0.8.6
-lxml==3.5.0
+lxml==4.6.5
 language_check==1.1
 sympound==0.2.0
 Flask==0.12
